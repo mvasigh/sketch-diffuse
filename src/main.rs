@@ -10,8 +10,8 @@ const F: f64 = 0.055;
 const K: f64 = 0.062;
 const WIDTH: usize = 800;
 const HEIGHT: usize = 800;
-const MAIN_HUE: f32 = 320.0;
-const ACCENT_HUE: f32 = 359.9;
+const MAIN_HUE: f32 = 200.0;
+const ACCENT_HUE: f32 = 100.9;
 
 /*
 Neighbor indices:
@@ -154,8 +154,8 @@ fn model(app: &App) -> Model {
         for y in 0..HEIGHT {
             let cell = field.cell_at_mut(x, y);
             let val = noise.get([
-                map_range(x, 0, WIDTH, 0.0, 60.0),
-                map_range(y, 0, HEIGHT, 0.0, 60.0),
+                map_range(x, 0, WIDTH, 0.0, 50.0),
+                map_range(y, 0, HEIGHT, 0.0, 50.0),
             ]);
             cell.b = if val > 0.1 { 1.0 } else { 0.0 };
             cell.a = if cell.b == 1.0 { 0.0 } else { 1.0 };

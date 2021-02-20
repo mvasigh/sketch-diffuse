@@ -1,0 +1,9 @@
+
+[package]
+name    = "diffuse"
+version = "0.1.0"
+authors = ["Mehdi Vasigh <mehdi.vasigh@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+nannou  = "0.15"

@@ -1,5 +1,5 @@
-use nannou::prelude::*;
 use nannou::noise::{NoiseFn, Perlin};
+use nannou::prelude::*;
 
 const A_INIT: f64 = 1.0;
 const B_INIT: f64 = 0.0;
@@ -10,6 +10,8 @@ const F: f64 = 0.055;
 const K: f64 = 0.062;
 const WIDTH: usize = 800;
 const HEIGHT: usize = 800;
+const MAIN_HUE: f32 = 320.0;
+const ACCENT_HUE: f32 = 359.9;
 
 /*
 Neighbor indices:
@@ -21,7 +23,15 @@ Neighbor indices:
 ║ 6 ║ 7 ║ 8 ║
 ╚═══╩═══╩═══╝
 */
-fn diffuse(cell: &Cell, x: usize, y: usize, field: &Field, scale: f64, feed: f64, kill: f64) -> Cell {
+fn diffuse(
+    cell: &Cell,
+    x: usize,
+    y: usize,
+    field: &Field,
+    scale: f64,
+    feed: f64,
+    kill: f64,
+) -> Cell {
     let top = if y == 0 { HEIGHT - 1 } else { y - 1 };
     let bottom = if y == HEIGHT - 1 { 0 } else { y + 1 };
     let left = if x == 0 { WIDTH - 1 } else { x - 1 };
@@ -144,10 +154,10 @@ fn model(app: &App) -> Model {
         for y in 0..HEIGHT {
             let cell = field.cell_at_mut(x, y);
             let val = noise.get([
-                map_range(x, 0, WIDTH, 0.0, 20.0),
-                map_range(y, 0, HEIGHT, 0.0, 20.0),
+                map_range(x, 0, WIDTH, 0.0, 60.0),
+                map_range(y, 0, HEIGHT, 0.0, 60.0),
             ]);
-            cell.b = if val > 0.7 { 1.0 } else { 0.0 };
+            cell.b = if val > 0.1 { 1.0 } else { 0.0 };
             cell.a = if cell.b == 1.0 { 0.0 } else { 1.0 };
         }
     }
@@ -161,9 +171,9 @@ fn model(app: &App) -> Model {
 }
 
 fn update(_app: &App, model: &mut Model, _update: Update) {
-    let z = (_app.elapsed_frames() as f64) * 0.1;
+    let z = (_app.elapsed_frames() as f64) * 0.01;
     let feed = map_range(model.noise.get([0.0, 0.0, z]), 0.0, 1.0, 0.054, 0.055);
-    let kill = map_range(model.noise.get([0.0, 0.1, z]), 0.0, 1.0, 0.062, 0.063);
+    let kill = map_range(model.noise.get([0.0, 1.0, z]), 0.0, 1.0, 0.060, 0.063);
     model.field.update(feed, kill);
 }
 
@@ -173,10 +183,11 @@ fn view(app: &App, model: &Model, frame: Frame) {
     let height = HEIGHT as u32;
     let image = nannou::image::ImageBuffer::from_fn(width, height, |x, y| {
         let cell = model.field.cell_at(x as usize, y as usize);
+        let clamped = clamp(cell.a - cell.b, 0.0, 1.0);
 
-        let hue = map_range(cell.a - cell.b, -1.0, 1.0, 0.0, 359.9);
-        let sat = map_range(cell.b - cell.a, -1.0, 1.0, 0.9, 1.0);
-        let lum = map_range(cell.a - cell.b, -1.0, 1.0, 0.0, 0.08);
+        let hue = map_range(clamped, 0.0, 1.0, MAIN_HUE, ACCENT_HUE);
+        let sat = 1.0 - map_range(clamped, 0.0, 1.0, 0.0, 0.1);
+        let lum = map_range(clamped, 0.0, 1.0, 0.1, 0.5);
 
         let hsl = Hsl::new(hue, sat, lum);
         let rgb = Srgb::from(hsl);

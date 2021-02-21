@@ -5,13 +5,13 @@ const A_INIT: f64 = 1.0;
 const B_INIT: f64 = 0.0;
 const D_A: f64 = 1.0;
 const D_B: f64 = 0.5;
-const D_T: f64 = 1.0;
+const D_T: f64 = 0.999;
 const F: f64 = 0.055;
 const K: f64 = 0.062;
 const WIDTH: usize = 800;
 const HEIGHT: usize = 800;
-const MAIN_HUE: f32 = 200.0;
-const ACCENT_HUE: f32 = 100.9;
+const MAIN_HUE: f32 = 2.0;
+const ACCENT_HUE: f32 = 342.0;
 
 /*
 Neighbor indices:
@@ -187,7 +187,7 @@ fn view(app: &App, model: &Model, frame: Frame) {
 
         let hue = map_range(clamped, 0.0, 1.0, MAIN_HUE, ACCENT_HUE);
         let sat = 1.0 - map_range(clamped, 0.0, 1.0, 0.0, 0.1);
-        let lum = map_range(clamped, 0.0, 1.0, 0.1, 0.5);
+        let lum = 0.5 - map_range(clamped, 0.0, 1.0, 0.0, 0.48);
 
         let hsl = Hsl::new(hue, sat, lum);
         let rgb = Srgb::from(hsl);
